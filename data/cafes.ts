@@ -11,217 +11,114 @@ export interface Cafe {
   description: string;
   facilities: string[];
   openHours: string;
+  lat?: number;
+  lng?: number;
+  distance?: number; // Tambahan opsional untuk kalkulasi jarak terdekat
 }
 
-export const cafes: Cafe[] = [
-  {
-    id: "1",
-    name: "Kopi Tuku",
-    location: "Jl. Cipete Raya No.78, Jakarta Selatan",
-    area: "Jakarta Selatan",
-    rating: 4.8,
-    reviewCount: 342,
-    priceRange: "$$",
-    image: "/cafes/cafe-1.webp",
-    tags: ["WiFi Cepat", "Cozy", "Coworking"],
-    description: "Ruang kerja nyaman dengan kopi specialty dan WiFi kencang. Tempat favorit freelancer Jakarta Selatan.",
-    facilities: ["WiFi", "Stop Kontak", "AC", "Mushola"],
-    openHours: "08:00 - 22:00",
-  },
-  {
-    id: "2",
-    name: "Titik Temu Coffee",
-    location: "Jl. Kemang Raya No.15, Jakarta Selatan",
-    area: "Jakarta Selatan",
-    rating: 4.7,
-    reviewCount: 289,
-    priceRange: "$$",
-    image: "/cafes/cafe-2.webp",
-    tags: ["Meeting Room", "Luas", "Estetik"],
-    description: "Cafe modern dengan meeting room dan area kerja luas. Cocok untuk meeting klien.",
-    facilities: ["WiFi", "Meeting Room", "Stop Kontak", "Parkir"],
-    openHours: "07:00 - 23:00",
-  },
-  {
-    id: "3",
-    name: "Makmur Jaya Coffee",
-    location: "Jl. Sudirman No.52, Jakarta Pusat",
-    area: "Jakarta Pusat",
-    rating: 4.6,
-    reviewCount: 198,
-    priceRange: "$$$",
-    image: "/cafes/cafe-3.webp",
-    tags: ["Premium", "CBD", "Quiet Zone"],
-    description: "Premium workspace di jantung CBD Jakarta. Suasana tenang untuk fokus maksimal.",
-    facilities: ["WiFi", "Stop Kontak", "Locker", "AC", "Printer"],
-    openHours: "06:30 - 21:00",
-  },
-  {
-    id: "4",
-    name: "Ruang Seduh",
-    location: "Jl. Senopati No.33, Jakarta Selatan",
-    area: "Jakarta Selatan",
-    rating: 4.9,
-    reviewCount: 456,
-    priceRange: "$$",
-    image: "/cafes/cafe-4.webp",
-    tags: ["Top Rated", "Instagramable", "Nyaman"],
-    description: "Cafe paling direkomendasikan untuk remote worker. Ambience sempurna dan kopi enak.",
-    facilities: ["WiFi", "Stop Kontak", "AC", "Outdoor"],
-    openHours: "08:00 - 22:00",
-  },
-  {
-    id: "5",
-    name: "Cerita Kopi",
-    location: "Jl. BSD Raya No.11, Tangerang Selatan",
-    area: "Tangerang Selatan",
-    rating: 4.5,
-    reviewCount: 167,
-    priceRange: "$",
-    image: "/cafes/cafe-5.webp",
-    tags: ["Affordable", "Spacious", "Pet Friendly"],
-    description: "Cafe affordable dengan ruang luas dan pet friendly. Pilihan tepat untuk kerja santai.",
-    facilities: ["WiFi", "Stop Kontak", "Parkir Luas", "Pet Area"],
-    openHours: "09:00 - 22:00",
-  },
-  {
-    id: "6",
-    name: "Filosofi Kopi",
-    location: "Jl. Melawai No.28, Jakarta Selatan",
-    area: "Jakarta Selatan",
-    rating: 4.7,
-    reviewCount: 523,
-    priceRange: "$$",
-    image: "/cafes/cafe-6.webp",
-    tags: ["Iconic", "Luas", "WiFi Cepat"],
-    description: "Cafe legendaris dengan suasana kerja yang produktif. WiFi super cepat dan menu lengkap.",
-    facilities: ["WiFi", "Stop Kontak", "AC", "Meeting Room"],
-    openHours: "07:00 - 23:00",
-  },
-  {
-    id: "7",
-    name: "Kopi Kenangan Workspace",
-    location: "Jl. Kuningan No.7, Jakarta Selatan",
-    area: "Jakarta Selatan",
-    rating: 4.4,
-    reviewCount: 234,
-    priceRange: "$",
-    image: "/cafes/cafe-7.webp",
-    tags: ["Budget", "Strategis", "Cepat"],
-    description: "Workspace terjangkau di lokasi strategis. Grab-and-go atau duduk lama, semua bisa.",
-    facilities: ["WiFi", "Stop Kontak", "AC"],
-    openHours: "07:00 - 22:00",
-  },
-  {
-    id: "8",
-    name: "Common Grounds",
-    location: "Jl. Bumi No.1, Jakarta Selatan",
-    area: "Jakarta Selatan",
-    rating: 4.8,
-    reviewCount: 387,
-    priceRange: "$$$",
-    image: "/cafes/cafe-8.webp",
-    tags: ["Premium", "Garden", "Event Space"],
-    description: "Workspace premium dengan taman hijau. Ideal untuk team offsite dan brainstorming.",
-    facilities: ["WiFi", "Stop Kontak", "Garden", "Event Space", "Parkir"],
-    openHours: "08:00 - 22:00",
-  },
-  {
-    id: "9",
-    name: "Anomali Coffee",
-    location: "Jl. Kemang Utara No.45, Jakarta Selatan",
-    area: "Jakarta Selatan",
-    rating: 4.6,
-    reviewCount: 301,
-    priceRange: "$$",
-    image: "/cafes/cafe-9.webp",
-    tags: ["Specialty Coffee", "Cozy", "Quiet"],
-    description: "Specialty coffee shop dengan suasana tenang. Single origin terbaik untuk menemani kerja.",
-    facilities: ["WiFi", "Stop Kontak", "AC", "Mushola"],
-    openHours: "08:00 - 21:00",
-  },
-  {
-    id: "10",
-    name: "Union Cafe",
-    location: "Jl. Pluit Karang No.12, Jakarta Utara",
-    area: "Jakarta Utara",
-    rating: 4.5,
-    reviewCount: 178,
-    priceRange: "$$",
-    image: "/cafes/cafe-10.webp",
-    tags: ["Jakarta Utara", "Family", "Spacious"],
-    description: "Cafe luas di Jakarta Utara dengan suasana family-friendly. Area kerja terpisah tersedia.",
-    facilities: ["WiFi", "Stop Kontak", "AC", "Parkir Luas", "Kids Area"],
-    openHours: "09:00 - 22:00",
-  },
-  {
-    id: "11",
-    name: "Popolo Coffee",
-    location: "Jl. Kebon Jeruk No.58, Jakarta Barat",
-    area: "Jakarta Barat",
-    rating: 4.3,
-    reviewCount: 145,
-    priceRange: "$",
-    image: "/cafes/cafe-11.webp",
-    tags: ["Affordable", "Minimalis", "Tenang"],
-    description: "Coffee shop minimalis dengan harga bersahabat. Ideal untuk mahasiswa dan freelancer.",
-    facilities: ["WiFi", "Stop Kontak", "AC"],
-    openHours: "08:00 - 21:00",
-  },
-  {
-    id: "12",
-    name: "Blueprint Coffee",
-    location: "Jl. Cikini Raya No.31, Jakarta Pusat",
-    area: "Jakarta Pusat",
-    rating: 4.7,
-    reviewCount: 267,
-    priceRange: "$$",
-    image: "/cafes/cafe-12.webp",
-    tags: ["Heritage", "Artistik", "Central"],
-    description: "Cafe berkonsep heritage di area Cikini. Suasana artistik yang menginspirasi kreativitas.",
-    facilities: ["WiFi", "Stop Kontak", "AC", "Galeri"],
-    openHours: "09:00 - 22:00",
-  },
-  {
-    id: "13",
-    name: "Tujuhari Coffee",
-    location: "Jl. Cipete Selatan No.20, Jakarta Selatan",
-    area: "Jakarta Selatan",
-    rating: 4.6,
-    reviewCount: 189,
-    priceRange: "$$",
-    image: "/cafes/cafe-13.webp",
-    tags: ["Hidden Gem", "Rooftop", "Sunset View"],
-    description: "Hidden gem dengan rooftop area. View sunset terbaik untuk menutup hari kerja.",
-    facilities: ["WiFi", "Stop Kontak", "Rooftop", "Outdoor"],
-    openHours: "10:00 - 23:00",
-  },
-  {
-    id: "14",
-    name: "Giyanti Coffee Roastery",
-    location: "Jl. Surabaya No.20, Jakarta Pusat",
-    area: "Jakarta Pusat",
-    rating: 4.8,
-    reviewCount: 412,
-    priceRange: "$$$",
-    image: "/cafes/cafe-14.webp",
-    tags: ["Roastery", "Premium", "Historical"],
-    description: "Roastery legendaris Jakarta dengan biji kopi pilihan. Pengalaman ngopi premium sambil bekerja.",
-    facilities: ["WiFi", "Stop Kontak", "AC", "Taman"],
-    openHours: "08:00 - 20:00",
-  },
-  {
-    id: "15",
-    name: "Kongkow Coffee",
-    location: "Jl. Depok Raya No.5, Depok",
-    area: "Depok",
-    rating: 4.4,
-    reviewCount: 156,
-    priceRange: "$",
-    image: "/cafes/cafe-15.webp",
-    tags: ["Mahasiswa", "Affordable", "24 Jam"],
-    description: "Cafe 24 jam favorit mahasiswa Depok. Harga bersahabat dengan fasilitas lengkap.",
-    facilities: ["WiFi", "Stop Kontak", "AC", "24 Jam"],
-    openHours: "24 Jam",
-  },
+// =======================================
+// CAFE NYATA (DIPISAH BERDASARKAN REGIONAL)
+// =======================================
+const bandungCafes = [
+  "Sejiwa Coffee", "Two Hands Full", "Kopi Toko Djawa", "Dago Bakery",
+  "Armor Kopi", "Wheels Coffee Roasters", "Jabarano Coffee", "Kinokimi Coffee",
+  "Massuka Coffee", "Yuma Coffee", "Kopi Calf", "Marka Coffee",
+  "Little Contrast", "Kopi Anjis", "Groei Coffee & Space", "Plumeria"
 ];
+
+const jakartaCafes = [
+  "Tanamera Coffee", "Titik Temu Coffee", "Filosofi Kopi", "Anomali Coffee",
+  "1/15 Coffee", "First Crack Coffee", "Gordi HQ", "Ombe Kofie",
+  "Dua Coffee", "Chief Coffee", "Stuja Coffee", "Kopi Kalyan",
+  "Harlan + Holden", "Kopi Manyar", "Tujuhari Coffee", "Common Grounds"
+];
+
+// =======================================
+// AREA DISTRIBUTION
+// =======================================
+const bandungAreas = [
+  { area: "Dago", city: "Bandung", lat: -6.889, lng: 107.612 },
+  { area: "Dipatiukur", city: "Bandung", lat: -6.899, lng: 107.615 },
+  { area: "Buah Batu", city: "Bandung", lat: -6.936, lng: 107.623 },
+  { area: "Braga", city: "Bandung", lat: -6.921, lng: 107.609 },
+  { area: "Setiabudi", city: "Bandung", lat: -6.865, lng: 107.597 },
+  { area: "Bojongsoang", city: "Bandung", lat: -6.973, lng: 107.630 },
+  { area: "Cihampelas", city: "Bandung", lat: -6.893, lng: 107.604 },
+];
+
+const jakartaAreas = [
+  { area: "Kemang", city: "Jakarta Selatan", lat: -6.261, lng: 106.814 },
+  { area: "Senopati", city: "Jakarta Selatan", lat: -6.228, lng: 106.809 },
+  { area: "Cipete", city: "Jakarta Selatan", lat: -6.277, lng: 106.804 },
+  { area: "Kuningan", city: "Jakarta Selatan", lat: -6.229, lng: 106.828 },
+  { area: "Menteng", city: "Jakarta Pusat", lat: -6.196, lng: 106.839 },
+  { area: "Kelapa Gading", city: "Jakarta Utara", lat: -6.158, lng: 106.904 },
+  { area: "Grogol", city: "Jakarta Barat", lat: -6.164, lng: 106.790 },
+  { area: "Depok Margonda", city: "Depok", lat: -6.390, lng: 106.830 },
+  { area: "BSD", city: "Tangerang Selatan", lat: -6.302, lng: 106.652 },
+];
+
+// =======================================
+// UTILITIES UNTUK RANDOMISASI
+// =======================================
+const allFacilities = ["WiFi", "Stop Kontak", "Meeting Room", "Parkir", "AC", "Mushola", "Outdoor", "Pet Friendly"];
+const allTags = ["WiFi Cepat", "Work Friendly", "Quiet Zone", "Instagramable", "Spacious", "Cozy", "Affordable", "Premium"];
+
+function randomCoord(base: number, spread: number) {
+  return base + (Math.random() - 0.5) * spread;
+}
+
+function getRandomElements(arr: string[], min: number, max: number) {
+  const shuffled = [...arr].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, Math.floor(Math.random() * (max - min + 1)) + min);
+}
+
+// =======================================
+// GENERATE 200 CAFE REALISTIS
+// =======================================
+export const cafes: Cafe[] = [];
+let idCounter = 1;
+
+// Generate 100 Kafe Bandung
+for (let i = 0; i < 100; i++) {
+  const name = bandungCafes[i % bandungCafes.length] + (i >= bandungCafes.length ? ` Cabang ${i}` : "");
+  const area = bandungAreas[i % bandungAreas.length];
+  cafes.push({
+    id: String(idCounter++),
+    name: name,
+    location: `${area.area}, ${area.city}`,
+    area: area.area,
+    rating: Number((4.0 + Math.random() * 0.9).toFixed(1)),
+    reviewCount: Math.floor(50 + Math.random() * 1500),
+    priceRange: ["$", "$$", "$$$"][Math.floor(Math.random() * 3)],
+    image: `/cafes/cafe-${(i % 23) + 1}.webp`, // Menggunakan 23 gambar yang sudah ada
+    tags: getRandomElements(allTags, 2, 4),
+    description: "Coffee shop populer dengan suasana nyaman untuk work from cafe, meeting kecil, atau nugas dengan WiFi stabil.",
+    facilities: getRandomElements(allFacilities, 3, 7), // Fasilitas diacak agar filter berguna
+    openHours: "08:00 - 22:00",
+    lat: randomCoord(area.lat, 0.03),
+    lng: randomCoord(area.lng, 0.03)
+  });
+}
+
+// Generate 100 Kafe Jakarta/Jabodetabek
+for (let i = 0; i < 100; i++) {
+  const name = jakartaCafes[i % jakartaCafes.length] + (i >= jakartaCafes.length ? ` Cabang ${i}` : "");
+  const area = jakartaAreas[i % jakartaAreas.length];
+  cafes.push({
+    id: String(idCounter++),
+    name: name,
+    location: `${area.area}, ${area.city}`,
+    area: area.area,
+    rating: Number((4.0 + Math.random() * 0.9).toFixed(1)),
+    reviewCount: Math.floor(50 + Math.random() * 1500),
+    priceRange: ["$", "$$", "$$$"][Math.floor(Math.random() * 3)],
+    image: `/cafes/cafe-${(i % 23) + 1}.webp`,
+    tags: getRandomElements(allTags, 2, 4),
+    description: "Ruang kerja komunal di jantung kota. Menyediakan kopi specialty dan area yang kondusif.",
+    facilities: getRandomElements(allFacilities, 3, 7),
+    openHours: "07:00 - 23:00",
+    lat: randomCoord(area.lat, 0.04),
+    lng: randomCoord(area.lng, 0.04)
+  });
+}

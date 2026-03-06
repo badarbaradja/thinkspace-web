@@ -16,12 +16,21 @@ export default function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  // ==========================================
+  // LOGIKA PENTING: SEMBUNYIKAN NAVBAR DI /AUTH
+  // ==========================================
+  if (pathname === "/auth") {
+    return null; // Membatalkan render Navbar seutuhnya
+  }
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-navy-950/95 backdrop-blur-lg border-b border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
+          
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
+            {/* Pastikan Anda memiliki file /logo.png di folder public Anda */}
             <Image src="/logo.png" alt="ThinkSpace" width={32} height={32} className="w-8 h-8" />
             <span className="text-lg font-bold text-white tracking-tight">
               ThinkSpace
@@ -48,13 +57,19 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* Desktop CTA */}
-          <div className="hidden md:flex items-center">
+          {/* Desktop CTA (SUDAH DIPISAH LOGIN & REGISTER) */}
+          <div className="hidden md:flex items-center gap-3">
             <Link
-              href="/kontak"
-              className="bg-accent hover:bg-accent-light text-navy-950 font-bold text-sm px-5 py-2.5 rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-accent/20"
+              href="/auth"
+              className="text-slate-300 hover:text-white font-semibold text-sm px-4 py-2.5 rounded-lg transition-colors duration-200"
             >
-              Hubungi Kami
+              Login
+            </Link>
+            <Link
+              href="/auth"
+              className="bg-accent hover:bg-yellow-400 text-navy-950 font-bold text-sm px-6 py-2.5 rounded-lg transition-all duration-200 shadow-lg shadow-accent/20"
+            >
+              Register
             </Link>
           </div>
 
@@ -111,13 +126,22 @@ export default function Navbar() {
                 </Link>
               );
             })}
-            <div className="pt-2">
+            
+            {/* Mobile CTA (DIPISAH LOGIN & REGISTER) */}
+            <div className="pt-4 mt-2 border-t border-white/10 flex flex-col gap-2">
               <Link
-                href="/kontak"
+                href="/auth"
                 onClick={() => setMobileOpen(false)}
-                className="block text-center bg-accent text-navy-950 font-bold text-sm px-5 py-3 rounded-lg"
+                className="flex items-center justify-center w-full bg-white/5 hover:bg-white/10 text-white font-semibold text-sm px-5 py-3 rounded-lg transition-colors"
               >
-                Hubungi Kami
+                Login
+              </Link>
+              <Link
+                href="/auth"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-center w-full bg-accent hover:bg-yellow-400 text-navy-950 font-bold text-sm px-5 py-3 rounded-lg transition-colors"
+              >
+                Register
               </Link>
             </div>
           </div>
