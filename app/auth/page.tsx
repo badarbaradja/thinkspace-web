@@ -2,6 +2,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { createClient } from "@supabase/supabase-js";
+
+// --- INISIALISASI SUPABASE ---
+const SUPABASE_URL = 'https://yxnpequkgdvzyuhugasa.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4bnBlcXVrZ2R2enl1aHVnYXNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5Mzc5NDQsImV4cCI6MjA4ODUxMzk0NH0.6wUroW8ysDYd9pOMysQ-BkmdK9RoiuRC0xjPRdU5vzg'; 
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 type AuthMode = "login" | "register" | "forgot_password";
 
@@ -18,43 +24,86 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // --- HANDLERS ---
-  const handleLogin = (e: React.FormEvent) => {
+  // --- HANDLERS DENGAN SUPABASE ---
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
     setIsLoading("credentials");
-    // Simulasi loading masuk
-    setTimeout(() => { router.push("/"); }, 1500);
+    
+    // Panggil API Supabase untuk Login
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
+
+    setIsLoading(null);
+
+    if (error) {
+      alert("❌ Login Gagal: " + error.message);
+    } else {
+      // Jika berhasil, arahkan kembali ke halaman sebelumnya atau beranda
+      router.back(); 
+    }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !password || password !== confirmPassword) return;
     setIsLoading("register");
-    // Simulasi loading daftar
-    setTimeout(() => { 
-      setIsLoading(null);
-      alert("Registrasi Berhasil! Silakan Login.");
+    
+    // Panggil API Supabase untuk Registrasi
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: {
+          full_name: name, // Simpan nama lengkap di metadata user
+        }
+      }
+    });
+
+    setIsLoading(null);
+
+    if (error) {
+      alert("❌ Registrasi Gagal: " + error.message);
+    } else {
+      alert("🎉 Registrasi Berhasil! Silakan Login menggunakan akun yang baru saja dibuat.");
       setAuthMode("login"); 
-    }, 1500);
+    }
   };
 
-  const handleResetPassword = (e: React.FormEvent) => {
+  const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
     setIsLoading("reset");
-    // Simulasi loading reset
-    setTimeout(() => { 
-      setIsLoading(null);
-      alert(`Link reset password telah dikirim ke ${email}`);
+    
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+
+    setIsLoading(null);
+
+    if (error) {
+      alert("❌ Gagal mengirim link reset: " + error.message);
+    } else {
+      alert(`✅ Link reset password telah dikirim ke ${email}. Silakan cek kotak masuk Anda.`);
       setAuthMode("login"); 
-    }, 1500);
+    }
   };
 
-  const handleSSOLogin = (provider: "google" | "apple") => {
+  const handleSSOLogin = async (provider: "google" | "apple") => {
     setIsLoading(provider);
-    // Simulasi loading SSO
-    setTimeout(() => { router.push("/"); }, 2000);
+    
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: provider,
+      options: {
+        redirectTo: window.location.origin, // Akan kembali ke beranda setelah SSO berhasil
+      }
+    });
+
+    if (error) {
+      alert(`❌ Gagal login dengan ${provider}: ` + error.message);
+      setIsLoading(null);
+    }
   };
 
   return (

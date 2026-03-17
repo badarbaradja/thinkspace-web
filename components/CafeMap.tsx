@@ -17,12 +17,10 @@ function FlyToUser({ coords }: { coords: [number, number] | null }) {
 }
 
 export default function CafeMap({ cafes, userLocation }: { cafes: any[], userLocation?: {lat: number, lng: number} | null }) {
+  // Pusat peta default di Bandung
   const centerPosition: [number, number] = [-6.914744, 107.60981];
 
-  // FIX ERROR: Pembuatan custom icon dimasukkan ke dalam useMemo
-  // Ini memastikan Leaflet (L) hanya dieksekusi di Client-Side (Browser), bukan di Server Next.js
   const mapIcons = useMemo(() => {
-    // Jika masih di server, jangan jalankan Leaflet
     if (typeof window === "undefined") return null;
 
     return {
@@ -58,7 +56,6 @@ export default function CafeMap({ cafes, userLocation }: { cafes: any[], userLoc
     };
   }, []);
 
-  // Jika icon belum siap (masih rendering awal), tampilkan area abu-abu kosong sementara
   if (!mapIcons) {
     return <div className="w-full h-full bg-slate-200 animate-pulse flex items-center justify-center text-slate-400 font-medium">Memuat Peta...</div>;
   }
@@ -69,10 +66,9 @@ export default function CafeMap({ cafes, userLocation }: { cafes: any[], userLoc
         <ZoomControl position="bottomright" />
         <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
         
-        {/* Helper untuk menggeser kamera peta otomatis */}
         <FlyToUser coords={userLocation ? [userLocation.lat, userLocation.lng] : null} />
 
-        {/* Marker Lokasi Pengguna (Jika ada) */}
+        {/* Marker Lokasi Pengguna */}
         {userLocation && (
           <Marker position={[userLocation.lat, userLocation.lng]} icon={mapIcons.userIcon}>
             <Popup className="custom-popup"><div className="p-2 font-bold text-navy-950 text-center">Lokasi Anda Saat Ini</div></Popup>
@@ -81,20 +77,41 @@ export default function CafeMap({ cafes, userLocation }: { cafes: any[], userLoc
 
         {/* Marker Kafe */}
         {cafes.map((cafe) => {
-          // Abaikan jika kafe tidak punya kordinat
           if (!cafe.lat || !cafe.lng) return null;
           
           return (
             <Marker key={cafe.id} position={[cafe.lat, cafe.lng]} icon={mapIcons.cafeIcon}>
               <Popup className="custom-popup">
-                <div className="text-center p-1 min-w-[150px]">
+                <div className="text-center p-1 min-w-[160px]">
+                  {/* Foto Kafe */}
                   <div className="w-full h-20 rounded-lg overflow-hidden mb-2 relative">
                      <img src={cafe.image} alt={cafe.name} className="w-full h-full object-cover" />
                      <div className="absolute top-1 right-1 bg-navy-950/80 backdrop-blur-sm text-accent text-[10px] font-bold px-1.5 py-0.5 rounded">⭐ {cafe.rating}</div>
                   </div>
+                  
+                  {/* Info Teks */}
                   <h3 className="font-bold text-navy-950 text-sm mb-0.5">{cafe.name}</h3>
                   <p className="text-[10px] text-slate-500 mb-3 truncate px-1">📍 {cafe.location}</p>
-                  <Link href={`/cafe/${cafe.id}`} className="bg-accent text-navy-950 text-xs font-bold px-4 py-2 rounded-lg hover:bg-yellow-400 block w-full">Lihat Detail</Link>
+                  
+                  {/* DUA TOMBOL AKSI */}
+                  <div className="flex flex-col gap-2 mt-2">
+                    {/* Tombol 1: Detail Aplikasi */}
+                    <Link href={`/cafe/${cafe.id}`} className="bg-accent text-navy-950 text-xs font-bold px-4 py-2 rounded-lg hover:bg-yellow-400 block w-full transition-colors shadow-sm">
+                      Lihat Detail
+                    </Link>
+                    
+                    {/* Tombol 2: Google Maps Routing (GROWTH HACK) */}
+                    <a 
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${cafe.lat},${cafe.lng}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-slate-100 text-slate-600 text-xs font-bold px-4 py-2 rounded-lg hover:bg-slate-200 hover:text-navy-950 block w-full transition-colors shadow-sm flex items-center justify-center gap-1.5"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                      Rute Google Maps
+                    </a>
+                  </div>
+
                 </div>
               </Popup>
             </Marker>

@@ -1,14 +1,21 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { cafes } from "@/data/cafes";
+import { createClient } from "@supabase/supabase-js";
 import CafeCard from "@/components/CafeCard";
 
-// Dynamic import untuk Leaflet agar tidak error "window is not defined" di Next.js
+// ==========================================
+// 1. KONEKSI KE SUPABASE
+// ==========================================
+const SUPABASE_URL = 'https://yxnpequkgdvzyuhugasa.supabase.co';
+// Ganti dengan Anon Key Anda
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4bnBlcXVrZ2R2enl1aHVnYXNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5Mzc5NDQsImV4cCI6MjA4ODUxMzk0NH0.6wUroW8ysDYd9pOMysQ-BkmdK9RoiuRC0xjPRdU5vzg';
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const InteractiveMap = dynamic(() => import("@/components/CafeMap"), { ssr: false });
 
 const filterAreas = [
-  "Semua Area", "Bojongsoang", "Dipatiukur", "Dago", "Ciumbuleuit", 
+  "Semua Area", "Bandung", "Dago", "Dipatiukur", "Ciumbuleuit", 
   "Buah Batu", "Jakarta Selatan", "Kemang", "Senopati", "Depok Margonda"
 ];
 
@@ -24,17 +31,10 @@ const priceOptions = [
   { id: "$$$", label: "Premium", desc: "> 100rb" },
 ];
 
-// Mapping harga karena data di backend memakai $, $$, $$$
-const priceMap: Record<string, string> = { 
-  "Semua": "Semua", 
-  "$": "$", 
-  "$$": "$$", 
-  "$$$": "$$$" 
-};
+const priceMap: Record<string, string> = { "Semua": "Semua", "$": "$", "$$": "$$", "$$$": "$$$" };
 
-// Fungsi rumus Haversine untuk menghitung jarak dalam kilometer
 function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
-  const R = 6371; // Radius Bumi dalam km
+  const R = 6371; 
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLon = (lon2 - lon1) * (Math.PI / 180);
   const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
@@ -43,6 +43,12 @@ function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
 }
 
 export default function FiturPage() {
+  // ==========================================
+  // 2. STATE UNTUK SUPABASE DATA
+  // ==========================================
+  const [cafes, setCafes] = useState<any[]>([]);
+  const [isLoadingDB, setIsLoadingDB] = useState(true);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [selectedArea, setSelectedArea] = useState("Semua Area");
@@ -51,9 +57,33 @@ export default function FiturPage() {
   const [minRating, setMinRating] = useState(4.0);
   const [sortBy, setSortBy] = useState("Rating Tertinggi");
 
-  // State untuk fitur Geolocation GPS
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
   const [isLocating, setIsLocating] = useState(false);
+
+  // ==========================================
+  // 3. FETCH DATA DARI DB SAAT MOUNTING
+  // ==========================================
+  useEffect(() => {
+    async function fetchCafes() {
+      setIsLoadingDB(true);
+      const { data, error } = await supabase.from('cafes').select('*');
+      
+      if (error) {
+        console.error("Gagal mengambil data dari Supabase:", error);
+      } else if (data) {
+        // Format data DB agar sesuai dengan format UI Card
+        const formattedData = data.map(item => ({
+          ...item,
+          priceRange: item.price_range, 
+          reviewCount: item.review_count
+        }));
+        setCafes(formattedData);
+      }
+      setIsLoadingDB(false);
+    }
+
+    fetchCafes();
+  }, []);
 
   const handleDetectLocation = () => {
     setIsLocating(true);
@@ -61,7 +91,7 @@ export default function FiturPage() {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setUserLocation({ lat: position.coords.latitude, lng: position.coords.longitude });
-          setSortBy("Terdekat"); // Otomatis ubah mode sorting
+          setSortBy("Terdekat");
           setIsLocating(false);
         },
         (error) => {
@@ -85,20 +115,22 @@ export default function FiturPage() {
       if (cafe.location.toLowerCase().includes(query)) suggestions.add(cafe.location);
     });
     return Array.from(suggestions).slice(0, 5);
-  }, [searchQuery]);
+  }, [searchQuery, cafes]);
 
   const filteredCafes = useMemo(() => {
     return cafes
       .filter((cafe) => {
         const matchSearch = cafe.name.toLowerCase().includes(searchQuery.toLowerCase()) || cafe.location.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchArea = selectedArea === "Semua Area" || cafe.location.toLowerCase().includes(selectedArea.toLowerCase());
+        const matchArea = selectedArea === "Semua Area" || cafe.location.toLowerCase().includes(selectedArea.toLowerCase()) || cafe.area.toLowerCase().includes(selectedArea.toLowerCase());
         const matchPrice = selectedPrice === "Semua" || cafe.priceRange === priceMap[selectedPrice];
-        const matchFacilities = selectedFacilities.every((facility) => cafe.facilities.includes(facility));
-        const matchRating = cafe.rating >= minRating;
+        
+        const safeFacilities = cafe.facilities || [];
+        const matchFacilities = selectedFacilities.every((facility) => safeFacilities.includes(facility));
+        
+        const matchRating = (cafe.rating || 0) >= minRating;
         return matchSearch && matchArea && matchPrice && matchFacilities && matchRating;
       })
       .map(cafe => {
-        // Jika ada lokasi user, hitung jarak masing-masing kafe
         if (userLocation && cafe.lat && cafe.lng) {
           const dist = getDistance(userLocation.lat, userLocation.lng, cafe.lat, cafe.lng);
           return { ...cafe, distance: dist };
@@ -107,13 +139,13 @@ export default function FiturPage() {
       })
       .sort((a, b) => {
         if (sortBy === "Terdekat" && a.distance !== undefined && b.distance !== undefined) return a.distance - b.distance;
-        if (sortBy === "Rating Tertinggi") return b.rating - a.rating;
-        if (sortBy === "Review Terbanyak") return b.reviewCount - a.reviewCount;
-        if (sortBy === "Harga Terendah") return a.priceRange.length - b.priceRange.length;
+        if (sortBy === "Rating Tertinggi") return (b.rating || 0) - (a.rating || 0);
+        if (sortBy === "Review Terbanyak") return (b.reviewCount || 0) - (a.reviewCount || 0);
+        if (sortBy === "Harga Terendah") return (a.priceRange || "").length - (b.priceRange || "").length;
         return 0;
-      })
-      .slice(0, 30); // Membatasi render 30 kafe saja agar performa browser tetap ringan
-  }, [searchQuery, selectedArea, selectedPrice, selectedFacilities, minRating, sortBy, userLocation]);
+      });
+      // PERHATIKAN: .slice(0, 30) Dihapus agar semua 50 data tampil
+  }, [searchQuery, selectedArea, selectedPrice, selectedFacilities, minRating, sortBy, userLocation, cafes]);
 
   const toggleFacility = (facility: string) => {
     setSelectedFacilities((prev) => prev.includes(facility) ? prev.filter((f) => f !== facility) : [...prev, facility]);
@@ -136,7 +168,7 @@ export default function FiturPage() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
             </svg>
-            Eksplorasi 200+ Workspace
+            Eksplorasi Spot Asli
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-4 tracking-tight">
             Temukan <span className="text-transparent bg-clip-text bg-linear-to-r from-accent to-yellow-200">Spot Nugas Idealmu</span>
@@ -152,9 +184,7 @@ export default function FiturPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            {/* ================================
-                KOLOM KIRI: FILTER PANEL 
-                ================================ */}
+            {/* FILTER PANEL */}
             <div className="lg:col-span-3">
               <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm lg:sticky lg:top-24">
                 <div className="flex items-center justify-between mb-6">
@@ -169,7 +199,6 @@ export default function FiturPage() {
                   </button>
                 </div>
 
-                {/* Area Dropdown */}
                 <div className="mb-6">
                   <label className="text-sm font-bold text-navy-950 block mb-2">Pilih Area</label>
                   <select 
@@ -183,7 +212,6 @@ export default function FiturPage() {
                   </select>
                 </div>
 
-                {/* UI Harga Deskriptif */}
                 <div className="mb-6">
                   <label className="text-sm font-bold text-navy-950 block mb-2">Estimasi Pengeluaran</label>
                   <div className="grid grid-cols-2 gap-2">
@@ -200,7 +228,6 @@ export default function FiturPage() {
                   </div>
                 </div>
 
-                {/* Facilities Checkboxes */}
                 <div className="mb-6">
                   <label className="text-sm font-bold text-navy-950 block mb-3">Fasilitas Wajib</label>
                   <div className="grid grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-2">
@@ -219,7 +246,6 @@ export default function FiturPage() {
                   </div>
                 </div>
 
-                {/* Rating Slider */}
                 <div className="mb-2">
                   <label className="text-sm font-bold text-navy-950 block mb-2 flex justify-between">
                     Rating Minimum <span className="text-accent bg-accent/10 px-2 py-0.5 rounded text-xs">⭐ {minRating.toFixed(1)}+</span>
@@ -238,15 +264,10 @@ export default function FiturPage() {
               </div>
             </div>
 
-            {/* ================================
-                KOLOM KANAN: SEARCH & RESULTS 
-                ================================ */}
+            {/* RESULTS AREA */}
             <div className="lg:col-span-9 flex flex-col gap-6">
               
-              {/* Top Bar: Search, GPS & Sort */}
               <div className="flex flex-col xl:flex-row gap-4 justify-between items-center bg-white p-4 rounded-3xl border border-slate-100 shadow-sm z-50">
-                
-                {/* Search Bar dengan Autocomplete */}
                 <div className="relative w-full xl:w-96 flex-shrink-0">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-slate-400">
@@ -268,7 +289,6 @@ export default function FiturPage() {
                      </button>
                   )}
 
-                  {/* Dropdown Suggestions */}
                   {isSearchFocused && searchSuggestions.length > 0 && (
                     <div className="absolute top-full left-0 w-full mt-2 bg-white border border-slate-100 shadow-2xl rounded-xl overflow-hidden animate-fade-in">
                       <p className="px-4 py-2 text-[10px] font-bold text-slate-400 bg-slate-50 uppercase tracking-wider">Saran Pencarian</p>
@@ -289,7 +309,6 @@ export default function FiturPage() {
                   )}
                 </div>
 
-                {/* GPS Button & Sort */}
                 <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
                   <button 
                     onClick={handleDetectLocation} 
@@ -312,26 +331,35 @@ export default function FiturPage() {
                 </div>
               </div>
 
-              {/* Peta Interaktif (Live WebGIS) */}
-              <div className="rounded-[2rem] border border-slate-200 shadow-sm h-80 sm:h-[400px] lg:h-[450px] bg-slate-100 relative overflow-hidden z-0">
-                <InteractiveMap cafes={filteredCafes} userLocation={userLocation} />
-              </div>
+              {/* TAMPILAN LOADING VS PETA */}
+              {isLoadingDB ? (
+                <div className="rounded-[2rem] border border-slate-200 shadow-sm h-80 sm:h-[400px] lg:h-[450px] bg-slate-200 animate-pulse flex flex-col items-center justify-center gap-4 text-slate-500">
+                  <svg className="animate-spin h-10 w-10 text-accent" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                  <p className="font-bold">Menarik Data dari Database...</p>
+                </div>
+              ) : (
+                <div className="rounded-[2rem] border border-slate-200 shadow-sm h-80 sm:h-[400px] lg:h-[450px] bg-slate-100 relative overflow-hidden z-0">
+                  <InteractiveMap cafes={filteredCafes} userLocation={userLocation} />
+                </div>
+              )}
 
-              {/* Status Header */}
               <div className="flex items-center justify-between mt-2">
                 <h3 className="font-bold text-xl text-navy-950">Rekomendasi Terbaik</h3>
                 <p className="text-sm font-bold text-accent bg-accent/10 px-3 py-1 rounded-lg">
-                  {filteredCafes.length} Tempat Ditemukan
+                  {isLoadingDB ? '...' : filteredCafes.length} Tempat Ditemukan
                 </p>
               </div>
 
-              {/* Cafe Grid / Empty State */}
-              {filteredCafes.length > 0 ? (
+              {/* TAMPILAN LOADING KARTU VS DAFTAR KAFE */}
+              {isLoadingDB ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                   {[1,2,3,4,5,6].map(i => <div key={i} className="h-72 bg-slate-100 rounded-3xl animate-pulse border border-slate-200"></div>)}
+                </div>
+              ) : filteredCafes.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                   {filteredCafes.map((cafe) => (
                     <div key={cafe.id} className="flex flex-col">
                       <CafeCard cafe={cafe} />
-                      {/* Indikator Jarak GPS (Hanya muncul kalau GPS aktif) */}
                       {userLocation && cafe.distance !== undefined && (
                         <p className="text-xs text-center font-bold text-green-600 mt-3 bg-green-50 rounded-xl py-2 border border-green-100">
                           🚗 {cafe.distance.toFixed(1)} km dari lokasimu
@@ -358,7 +386,6 @@ export default function FiturPage() {
         </div>
       </section>
 
-      {/* Style Animasi */}
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes fade-in { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fade-in 0.2s ease-out forwards; }

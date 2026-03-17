@@ -31,9 +31,9 @@ export default function HomePage() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Link href="#download" className="bg-accent hover:bg-yellow-400 text-navy-950 font-bold px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-accent/20 flex items-center justify-center gap-2">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17"></path></svg>
-                  Coba Aplikasi Sekarang
+                {/* ADJUSTMENT: Diarahkan ke halaman /fitur (Peta) */}
+                <Link href="/fitur" className="bg-accent hover:bg-yellow-400 text-navy-950 font-bold px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-accent/20 flex items-center justify-center gap-2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>                  Eksplor Peta Sekarang
                 </Link>
                 <Link href="/mitra" className="px-8 py-3.5 rounded-xl border border-white/20 text-white font-medium hover:bg-white/5 transition-all flex items-center justify-center">
                   Daftar Jadi Mitra
@@ -78,7 +78,10 @@ export default function HomePage() {
                         </div>
                         <p className="text-sm text-slate-300">Kursi Kosong<br/><span className="text-xs text-slate-400">Update detik ini</span></p>
                       </div>
-                      <button className="w-full bg-accent text-navy-950 font-bold py-3 rounded-xl text-sm shadow-md hover:bg-yellow-400 transition-colors">Booking Sekarang</button>
+                      {/* ADJUSTMENT: Diarahkan ke halaman /fitur */}
+                      <Link href="/fitur" className="block text-center w-full bg-accent text-navy-950 font-bold py-3 rounded-xl text-sm shadow-md hover:bg-yellow-400 transition-colors">
+                        Cari Tempat Nugas
+                      </Link>
                     </div>
 
                     <div className="bg-white/5 border border-white/5 p-4 rounded-2xl opacity-70 mt-2">
@@ -177,8 +180,9 @@ export default function HomePage() {
                 <li className="flex items-center gap-3"><span className="text-accent text-lg">✔</span> Seamless 1-Click Login</li>
                 <li className="flex items-center gap-3"><span className="text-accent text-lg">✔</span> Smart Maps Discovery</li>
               </ul>
-              <Link href="#download" className="bg-accent text-navy-950 font-bold py-3.5 px-8 rounded-xl w-full max-w-xs hover:bg-yellow-400 transition-colors">
-                Gunakan Aplikasi
+              {/* ADJUSTMENT: Diarahkan ke halaman /fitur */}
+              <Link href="/fitur" className="bg-accent text-navy-950 font-bold py-3.5 px-8 rounded-xl w-full max-w-xs hover:bg-yellow-400 transition-colors">
+                Mulai Pencarian
               </Link>
             </div>
 
@@ -204,7 +208,6 @@ export default function HomePage() {
       </section>
 
       {/* ===== B2B / MITRA DEEP DIVE DENGAN REALISTIC LAPTOP ===== */}
-      {/* Menggunakan bg-navy-950 agar transisi warnanya mulus dari section di atas */}
       <section className="bg-navy-950 py-24 relative overflow-hidden">
         <div className="absolute right-0 bottom-0 opacity-10">
            <svg width="400" height="400" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path fill="#FACC15" d="M45.7,-76.1C58.9,-69.3,68.8,-55.4,76.5,-40.8C84.2,-26.2,89.7,-10.9,87.6,3.6C85.5,18.1,75.8,31.8,65.3,44.1C54.8,56.4,43.5,67.3,29.8,74.5C16.1,81.7,0,85.2,-14.8,82.4C-29.6,79.6,-43.1,70.5,-55.2,59.5C-67.3,48.5,-78.1,35.6,-83.4,20.4C-88.7,5.2,-88.5,-12.3,-82.4,-27.4C-76.3,-42.5,-64.3,-55.2,-50.7,-61.8C-37.1,-68.4,-21.9,-68.9,-5.8,-60.1C10.3,-51.3,32.5,-82.9,45.7,-76.1Z" transform="translate(100 100)" /></svg>

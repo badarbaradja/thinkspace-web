@@ -9,10 +9,15 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.99.2",
+    "dotenv": "^17.3.1",
+    "fs": "^0.0.1-security",
     "leaflet": "^1.9.4",
     "next": "16.1.6",
+    "node-fetch": "^3.3.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-easy-crop": "^5.5.6",
     "react-leaflet": "^5.0.0"
   },
   "devDependencies": {
@@ -25,5 +30,18 @@
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/badarbaradja/thinkspace-web.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/badarbaradja/thinkspace-web/issues"
+  },
+  "homepage": "https://github.com/badarbaradja/thinkspace-web#readme"
 }
